@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/plysiu/iothub-manager#readme",
   "dependencies": {
-    "angular": "^1.4.8"
+    "angular": "^1.4.8",
+    "iothub-angular": "git+ssh://git@github.com/plysiu/iothub-angular.git"
   }
 }
