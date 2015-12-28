@@ -5,4 +5,5 @@ var app = express();
 app.use(express.static('src'));
 
 var server = app.listen(3000, function () {
+    console.log('Server on');
 });

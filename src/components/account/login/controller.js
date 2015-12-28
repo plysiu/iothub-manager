@@ -1,4 +1,4 @@
-angular.module('controllers', [])
+angular.module('iothub-manager')
     .controller('AccountLoginController', ['$log', function ($log) {
-        $log.log('AcountLoginController');
+        $log.log('Login');
     }]);
