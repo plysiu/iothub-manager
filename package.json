@@ -4,7 +4,12 @@
   "description": "IoTHuB manager.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "serve": "bower update && node ./scripts/server.js",
+    "watch": "npm-watch"
+  },
+  "watch": {
+    "serve": "./src/**.js"
   },
   "repository": {
     "type": "git",
@@ -19,5 +24,11 @@
   "dependencies": {
     "angular": "^1.4.8",
     "iothub-angular": "git+ssh://git@github.com/plysiu/iothub-angular.git"
+  },
+  "devDependencies": {
+    "bower": "^1.7.1",
+    "express": "^4.13.3",
+    "npm-watch": "0.0.1",
+    "watch": "^0.16.0"
   }
 }

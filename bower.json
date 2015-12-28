@@ -1,0 +1,27 @@
+{
+  "name": "iothub-manager",
+  "description": "IoTHuB manager.",
+  "main": "index.js",
+  "directory": "src/bower_components/",
+  "authors": [
+    "Przemysław Płyś <przemyslaw.plys@gmail.com>"
+  ],
+  "license": "ISC",
+  "homepage": "https://github.com/plysiu/iothub-manager",
+  "moduleType": [],
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular": "~1.4.8",
+    "iothub-angular": "https://github.com/plysiu/iothub-angular.git",
+    "angular-material": "~1.0.0",
+    "angular-route": "~1.4.8",
+    "material-design-icons": "~2.1.1"
+  }
+}
