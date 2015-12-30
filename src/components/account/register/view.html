@@ -1,0 +1,23 @@
+<form name="registerFrom" >
+    <h2>Register</h2>
+    <md-input-container class="md-block">
+        <label>E-mail</label>
+        <input type="email" ng-model="register.email" required>
+        <div ng-messages="registerFrom.email.$error">
+            <div ng-message="required">E-mail is required.</div>
+        </div>
+    </md-input-container>
+    <md-input-container class="md-block">
+        <label>Password</label>
+        <input type="password" ng-model="register.password" required>
+        <div ng-messages="registerFrom.password.$error">
+            <div ng-message="required">Password is required.</div>
+        </div>
+    </md-input-container>
+    <section layout="row">
+
+        <md-button ng-click="register()" class="md-raised">Register account</md-button>
+        <md-button md-no-ink href="#/account/login" class="md-primary">Login</md-button>
+    </section>
+
+</form>

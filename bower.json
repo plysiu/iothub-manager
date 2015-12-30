@@ -22,6 +22,8 @@
     "iothub-angular": "https://github.com/plysiu/iothub-angular.git",
     "angular-material": "~1.0.0",
     "angular-route": "~1.4.8",
-    "material-design-icons": "~2.1.1"
+    "material-design-icons": "~2.1.1",
+    "ngstorage": "~0.3.10",
+    "angular-jwt": "~0.0.9"
   }
 }
