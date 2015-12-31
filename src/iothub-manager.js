@@ -4,9 +4,11 @@ angular
         'ngResource',
         'ngStorage',
         'angular-jwt',
+        'ngMessages',
         'ngMaterial'])
     .constant('iothub', {
         host: 'http://localhost:9000',
+        login:'account/login'
     })
     .config(['$routeProvider', '$locationProvider',
         function ($routeProvider, $locationProvider) {
@@ -35,20 +37,44 @@ angular
         }])
     .config(function ($httpProvider, jwtInterceptorProvider) {
         // Please note we're annotating the function so that the $injector works when the file is minified
-        jwtInterceptorProvider.tokenGetter = ['$localStorage', function ($localStorage) {
+        jwtInterceptorProvider.tokenGetter = ['$localStorage', function($localStorage) {
             return $localStorage.Authorization;
         }];
-
         $httpProvider.interceptors.push('jwtInterceptor');
+        $httpProvider.interceptors.push('AuthenticationInterceptor');
     })
     .run(['$location', function ($location) {
         console.log($location.path());
     }])
-    .factory('AuthenticationService', ['$http', 'iothub', function ($http, iothub) {
-        return {
-            token: function (user) {
-                return $http.post(iothub.host + '/authentication', {data: user});
+    .factory('AuthenticationInterceptor', ['$q', '$localStorage', 'jwtHelper', 'iothub', function($q, $localStorage, jwtHelper, iothub) {
+         return {
+            responseError: function (response) {
+                if (response.status === 401) {
+                    $location.path(iothub.login);
+                    delete $localStorage.Authorization;
+                    return $q.reject(response);
+                }
+                else {
+                    return $q.reject(response);
+                }
             }
+        }
+    }])
+    .factory('AuthenticationService', ['$http', 'iothub', 'jwtHelper', function ($http, iothub, jwtHelper) {
+        return {
+            token: function (loginData) {
+                return $http.post(iothub.host + '/authentication', {data: loginData});
+            },
+             isAuthenticated: function() {
+                 return jwtHelper.isTokenExpired($localStorage.Authorization);
+            },
+             getUser: function() {
+                 return jwtHelper.decodeToken($localStorage.Authorization);
+             },
+             logout:function() {
+             delete $localStorage.Authorization;
+            }
+            
         };
     }])
     .factory('AccountService', ['$resource', 'iothub', function ($resource, iothub) {
