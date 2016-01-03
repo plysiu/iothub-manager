@@ -8,12 +8,74 @@ angular
         'ngMaterial'])
     .constant('iothub', {
         host: 'http://localhost:9000',
-        login:'account/login'
+        login: 'account/login'
     })
+    .config(['$httpProvider', 'jwtInterceptorProvider', function Config($httpProvider, jwtInterceptorProvider) {
+        jwtInterceptorProvider.tokenGetter = ['config', '$localStorage', function (config, $localStorage) {
+            //if (config.url.indexOf('ocalhost:9112') >= 0) {
+            //    return null;
+            //}
+
+            return $localStorage.Authorization;
+        }];
+
+        $httpProvider.interceptors.push('jwtInterceptor');
+        //$httpProvider.interceptors.push('AuthenticationInterceptor');
+    }])
+    .factory('AuthenticationInterceptor', ['$q', '$localStorage', 'jwtHelper', 'iothub',
+        function ($q, $localStorage, jwtHelper, iothub) {
+            return {
+                responseError: function (response) {
+                    if (response.status === 401) {
+                        //     $location.path(iothub.login);
+                        return $q.reject(response);
+                    }
+                    else {
+                        return $q.reject(response);
+                    }
+                }
+            }
+        }])
+
+
+    .factory('AuthenticationService', ['$http', 'iothub', '$localStorage', 'jwtHelper',
+        function ($http, iothub, $localStorage, jwtHelper) {
+            return {
+                token: function (loginData) {
+                    return $http.post(iothub.host + '/authentication', loginData);
+                },
+                hasAuthorization: function () {
+                    if ($localStorage.Authorization) {
+                        return jwtHelper.isTokenExpired(this.getToken()) === false;
+                    }
+                    else {
+                        return false;
+                    }
+                },
+                getUser: function () {
+                    if (this.hasAuthorization()) {
+                        return jwtHelper.decodeToken(this.getToken());
+                    }
+                    return false;
+                },
+                setToken: function (token) {
+                    $localStorage.Authorization = token;
+                },
+                getToken: function () {
+                    return $localStorage.Authorization;
+                },
+                logout: function(){
+                    delete $localStorage.Authorization;     
+                }
+            };
+        }])
+    .factory('AccountService', ['$resource', 'iothub',
+        function ($resource, iothub) {
+            return $resource(iothub.host + '/accounts/:accountId', {accountId: '@_id'});
+        }])
+
     .config(['$routeProvider', '$locationProvider',
         function ($routeProvider, $locationProvider) {
-            // $locationProvider.html5Mode(true);
-            //$locationProvider.hashPrefix('#');
             $routeProvider
                 .when('/account/register', {
                     templateUrl: 'components/account/register/view.html',
@@ -24,8 +86,12 @@ angular
                     controller: 'AccountLoginController'
                 })
                 .when('/account/logout', {
-                    templateUrl: 'components/account/logout/view.html',
+                    template: '',
                     controller: 'AccountLogoutController'
+                })
+                .when('/account/dashboard', {
+                    templateUrl: 'components/account/dashboard/view.html',
+                    controller: 'AccountDashboardController'
                 })
                 .when('/homepage', {
                     templateUrl: 'components/homepage/view.html',
@@ -35,53 +101,7 @@ angular
                     redirectTo: '/account/login'
                 });
         }])
-    .config(function ($httpProvider, jwtInterceptorProvider) {
-        // Please note we're annotating the function so that the $injector works when the file is minified
-        jwtInterceptorProvider.tokenGetter = ['$localStorage', function($localStorage) {
-            return $localStorage.Authorization;
-        }];
-        $httpProvider.interceptors.push('jwtInterceptor');
-        $httpProvider.interceptors.push('AuthenticationInterceptor');
-    })
-    .run(['$location', function ($location) {
-        console.log($location.path());
-    }])
-    .factory('AuthenticationInterceptor', ['$q', '$localStorage', 'jwtHelper', 'iothub', function($q, $localStorage, jwtHelper, iothub) {
-         return {
-            responseError: function (response) {
-                if (response.status === 401) {
-                    $location.path(iothub.login);
-                    delete $localStorage.Authorization;
-                    return $q.reject(response);
-                }
-                else {
-                    return $q.reject(response);
-                }
-            }
-        }
-    }])
-    .factory('AuthenticationService', ['$http', 'iothub', 'jwtHelper', function ($http, iothub, jwtHelper) {
-        return {
-            token: function (loginData) {
-                return $http.post(iothub.host + '/authentication', {data: loginData});
-            },
-             isAuthenticated: function() {
-                 return jwtHelper.isTokenExpired($localStorage.Authorization);
-            },
-             getUser: function() {
-                 return jwtHelper.decodeToken($localStorage.Authorization);
-             },
-             logout:function() {
-             delete $localStorage.Authorization;
-            }
-            
-        };
-    }])
-    .factory('AccountService', ['$resource', 'iothub', function ($resource, iothub) {
-        return $resource(iothub.host + '/accounts/:accountId', {accountId: '@_id'});
-    }])
-    .controller('AppCtrl', ['$scope', '$mdSidenav', function ($scope, $mdSidenav) {
-        $scope.toggleSidenav = function (menuId) {
-            $mdSidenav(menuId).toggle();
-        };
-    }]);
+    .run(['$location',
+        function ($location) {
+            console.log($location.path());
+        }]);
