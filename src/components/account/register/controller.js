@@ -2,7 +2,6 @@ angular.module('iothub-manager')
     .controller('AccountRegisterController', ['$log', '$location', '$scope', 'AccountService',
         function ($log, $location, $scope, AccountService) {
             $scope.register = function () {
-                console.log('REGISTER');
                 new AccountService($scope.register).$save(
                     function (user) {
                         $location.path('account/login');

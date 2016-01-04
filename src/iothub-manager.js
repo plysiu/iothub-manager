@@ -12,32 +12,10 @@ angular
     })
     .config(['$httpProvider', 'jwtInterceptorProvider', function Config($httpProvider, jwtInterceptorProvider) {
         jwtInterceptorProvider.tokenGetter = ['config', '$localStorage', function (config, $localStorage) {
-            //if (config.url.indexOf('ocalhost:9112') >= 0) {
-            //    return null;
-            //}
-
             return $localStorage.Authorization;
         }];
-
         $httpProvider.interceptors.push('jwtInterceptor');
-        //$httpProvider.interceptors.push('AuthenticationInterceptor');
     }])
-    .factory('AuthenticationInterceptor', ['$q', '$localStorage', 'jwtHelper', 'iothub',
-        function ($q, $localStorage, jwtHelper, iothub) {
-            return {
-                responseError: function (response) {
-                    if (response.status === 401) {
-                        //     $location.path(iothub.login);
-                        return $q.reject(response);
-                    }
-                    else {
-                        return $q.reject(response);
-                    }
-                }
-            }
-        }])
-
-
     .factory('AuthenticationService', ['$http', 'iothub', '$localStorage', 'jwtHelper',
         function ($http, iothub, $localStorage, jwtHelper) {
             return {
@@ -73,7 +51,6 @@ angular
         function ($resource, iothub) {
             return $resource(iothub.host + '/accounts/:accountId', {accountId: '@_id'});
         }])
-
     .config(['$routeProvider', '$locationProvider',
         function ($routeProvider, $locationProvider) {
             $routeProvider
