@@ -7,7 +7,7 @@ angular
         'ngMessages',
         'ngMaterial'])
     .constant('iothub', {
-        host: 'http://localhost:9000',
+        host: 'http://api.iothub.pl',
         login: 'account/login'
     })
     .config(['$httpProvider', 'jwtInterceptorProvider', function Config($httpProvider, jwtInterceptorProvider) {
@@ -42,8 +42,8 @@ angular
                 getToken: function () {
                     return $localStorage.Authorization;
                 },
-                logout: function(){
-                    delete $localStorage.Authorization;     
+                logout: function () {
+                    delete $localStorage.Authorization;
                 }
             };
         }])
